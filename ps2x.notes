@@ -1,0 +1,29 @@
+[header]
+	inline functions(cpp), clk_set, clk_clr, cmd_set, cmd_clr, att_set att_clr, dat_chk
+	'register' variable integer
+[c]
+	[ps2x library notes]
+	_gamepad_shiftinout
+		takes in a byte then shifts it to output
+	[c++ syntax found]
+		typecast?, check if typecast have a c equivalent
+			-e.g. ~154 '(uint16_t)'
+	[Arduino functions found]
+		bitSet
+		delayMicroseconds
+		Serial.print
+		pinMode
+		millis
+	[Microprocessor specific stuff]
+		Seems to be microprocessor specific functions, constructed by preprocessor
+			e.g. '#ifdef __AVR__'
+		Need to use wixel's mcu io library.
+		replace ps2x io librarie with gpio.h, http://pololu.github.io/wixel-sdk/gpio_8h.html
+		replace ps2x volatile memory with wixel's volatile memory.
+		
+
+
+		
+
+	
+
