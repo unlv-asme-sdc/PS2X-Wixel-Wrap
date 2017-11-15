@@ -11,7 +11,7 @@ static byte enable_rumble[]={0x01,0x4D,0x00,0x00,0x01};
 static byte type_read[]={0x01,0x45,0x00,0x5A,0x5A,0x5A,0x5A,0x5A,0x5A};
 
 /****************************************************************************************/
-boolean NewButtonState() {
+boolean NewButtonsState() {
   return ((last_buttons ^ buttons) > 0);
 }
 
@@ -74,7 +74,7 @@ void read_gamepad() {
 }
 
 /****************************************************************************************/
-boolean read_gamepad(boolean motor1, byte motor2) {
+boolean read_gamepad_ext(boolean motor1, byte motor2) {
    double temp = millis() - last_read;
 
    if (temp > 1500) //waited to long
@@ -158,7 +158,7 @@ byte config_gamepad(uint8_t clk, uint8_t cmd, uint8_t att, uint8_t dat) {
 }
 
 /****************************************************************************************/
-byte config_gamepad(uint8_t clk, uint8_t cmd, uint8_t att, uint8_t dat, bool pressures, bool rumble) {
+byte config_gamepad_ext(uint8_t clk, uint8_t cmd, uint8_t att, uint8_t dat, bool pressures, bool rumble) {
 
   byte temp[sizeof(type_read)];
 
