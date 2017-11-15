@@ -1,14 +1,7 @@
-#include "PS2X_lib.h"
+#include "PS2X_w_lib.h"
 #include <math.h>
 #include <stdio.h>
 #include <stdint.h>
-#include <avr/io.h>
-#if ARDUINO > 22
-  #include "Arduino.h"
-#else
-  #include "WProgram.h"
-  #include "pins_arduino.h"
-#endif
 
 static byte enter_config[]={0x01,0x43,0x00,0x01,0x00};
 static byte set_mode[]={0x01,0x44,0x00,0x01,0x03,0x00,0x00,0x00,0x00};
@@ -18,42 +11,42 @@ static byte enable_rumble[]={0x01,0x4D,0x00,0x00,0x01};
 static byte type_read[]={0x01,0x45,0x00,0x5A,0x5A,0x5A,0x5A,0x5A,0x5A};
 
 /****************************************************************************************/
-boolean PS2X::NewButtonState() {
+boolean NewButtonState() {
   return ((last_buttons ^ buttons) > 0);
 }
 
 /****************************************************************************************/
-boolean PS2X::NewButtonState(unsigned int button) {
+boolean NewButtonState(unsigned int button) {
   return (((last_buttons ^ buttons) & button) > 0);
 }
 
 /****************************************************************************************/
-boolean PS2X::ButtonPressed(unsigned int button) {
+boolean ButtonPressed(unsigned int button) {
   return(NewButtonState(button) & Button(button));
 }
 
 /****************************************************************************************/
-boolean PS2X::ButtonReleased(unsigned int button) {
+boolean ButtonReleased(unsigned int button) {
   return((NewButtonState(button)) & ((~last_buttons & button) > 0));
 }
 
 /****************************************************************************************/
-boolean PS2X::Button(uint16_t button) {
+boolean Button(uint16_t button) {
   return ((~buttons & button) > 0);
 }
 
 /****************************************************************************************/
-unsigned int PS2X::ButtonDataByte() {
+unsigned int ButtonDataByte() {
    return (~buttons);
 }
 
 /****************************************************************************************/
-byte PS2X::Analog(byte button) {
+byte Analog(byte button) {
    return PS2data[button];
 }
 
 /****************************************************************************************/
-unsigned char PS2X::_gamepad_shiftinout (char byte) {
+unsigned char _gamepad_shiftinout (char byte) {
    unsigned char tmp = 0;
    for(unsigned char i=0;i<8;i++) {
       if(CHK(byte,i)) CMD_SET();
@@ -76,12 +69,12 @@ unsigned char PS2X::_gamepad_shiftinout (char byte) {
 }
 
 /****************************************************************************************/
-void PS2X::read_gamepad() {
+void read_gamepad() {
    read_gamepad(false, 0x00);
 }
 
 /****************************************************************************************/
-boolean PS2X::read_gamepad(boolean motor1, byte motor2) {
+boolean read_gamepad(boolean motor1, byte motor2) {
    double temp = millis() - last_read;
 
    if (temp > 1500) //waited to long
@@ -160,12 +153,12 @@ boolean PS2X::read_gamepad(boolean motor1, byte motor2) {
 }
 
 /****************************************************************************************/
-byte PS2X::config_gamepad(uint8_t clk, uint8_t cmd, uint8_t att, uint8_t dat) {
+byte config_gamepad(uint8_t clk, uint8_t cmd, uint8_t att, uint8_t dat) {
    return config_gamepad(clk, cmd, att, dat, false, false);
 }
 
 /****************************************************************************************/
-byte PS2X::config_gamepad(uint8_t clk, uint8_t cmd, uint8_t att, uint8_t dat, bool pressures, bool rumble) {
+byte config_gamepad(uint8_t clk, uint8_t cmd, uint8_t att, uint8_t dat, bool pressures, bool rumble) {
 
   byte temp[sizeof(type_read)];
 
@@ -280,7 +273,7 @@ byte PS2X::config_gamepad(uint8_t clk, uint8_t cmd, uint8_t att, uint8_t dat, bo
 }
 
 /****************************************************************************************/
-void PS2X::sendCommandString(byte string[], byte len) {
+void sendCommandString(byte string[], byte len) {
 #ifdef PS2X_COM_DEBUG
   byte temp[len];
   ATT_CLR(); // low enable joystick
@@ -310,7 +303,7 @@ void PS2X::sendCommandString(byte string[], byte len) {
 }
 
 /****************************************************************************************/
-byte PS2X::readType() {
+byte readType() {
 /*
   byte temp[sizeof(type_read)];
 
@@ -349,7 +342,7 @@ byte PS2X::readType() {
 }
 
 /****************************************************************************************/
-void PS2X::enableRumble() {
+void enableRumble() {
   sendCommandString(enter_config, sizeof(enter_config));
   sendCommandString(enable_rumble, sizeof(enable_rumble));
   sendCommandString(exit_config, sizeof(exit_config));
@@ -357,7 +350,7 @@ void PS2X::enableRumble() {
 }
 
 /****************************************************************************************/
-bool PS2X::enablePressures() {
+bool enablePressures() {
   sendCommandString(enter_config, sizeof(enter_config));
   sendCommandString(set_bytes_large, sizeof(set_bytes_large));
   sendCommandString(exit_config, sizeof(exit_config));
@@ -373,7 +366,7 @@ bool PS2X::enablePressures() {
 }
 
 /****************************************************************************************/
-void PS2X::reconfig_gamepad(){
+void reconfig_gamepad(){
   sendCommandString(enter_config, sizeof(enter_config));
   sendCommandString(set_mode, sizeof(set_mode));
   if (en_Rumble)
@@ -385,79 +378,79 @@ void PS2X::reconfig_gamepad(){
 
 /****************************************************************************************/
 #ifdef __AVR__
-inline void  PS2X::CLK_SET(void) {
+inline void  CLK_SET(void) {
   register uint8_t old_sreg = SREG;
   cli();
   *_clk_oreg |= _clk_mask;
   SREG = old_sreg;
 }
 
-inline void  PS2X::CLK_CLR(void) {
+inline void  CLK_CLR(void) {
   register uint8_t old_sreg = SREG;
   cli();
   *_clk_oreg &= ~_clk_mask;
   SREG = old_sreg;
 }
 
-inline void  PS2X::CMD_SET(void) {
+inline void  CMD_SET(void) {
   register uint8_t old_sreg = SREG;
   cli();
   *_cmd_oreg |= _cmd_mask; // SET(*_cmd_oreg,_cmd_mask);
   SREG = old_sreg;
 }
 
-inline void  PS2X::CMD_CLR(void) {
+inline void  CMD_CLR(void) {
   register uint8_t old_sreg = SREG;
   cli();
   *_cmd_oreg &= ~_cmd_mask; // SET(*_cmd_oreg,_cmd_mask);
   SREG = old_sreg;
 }
 
-inline void  PS2X::ATT_SET(void) {
+inline void  ATT_SET(void) {
   register uint8_t old_sreg = SREG;
   cli();
   *_att_oreg |= _att_mask ;
   SREG = old_sreg;
 }
 
-inline void PS2X::ATT_CLR(void) {
+inline void ATT_CLR(void) {
   register uint8_t old_sreg = SREG;
   cli();
   *_att_oreg &= ~_att_mask;
   SREG = old_sreg;
 }
 
-inline bool PS2X::DAT_CHK(void) {
+inline bool DAT_CHK(void) {
   return (*_dat_ireg & _dat_mask) ? true : false;
 }
 
 #else
 // On pic32, use the set/clr registers to make them atomic...
-inline void  PS2X::CLK_SET(void) {
+inline void  CLK_SET(void) {
   *_clk_lport_set |= _clk_mask;
 }
 
-inline void  PS2X::CLK_CLR(void) {
+inline void  CLK_CLR(void) {
   *_clk_lport_clr |= _clk_mask;
 }
 
-inline void  PS2X::CMD_SET(void) {
+inline void  CMD_SET(void) {
   *_cmd_lport_set |= _cmd_mask;
 }
 
-inline void  PS2X::CMD_CLR(void) {
+inline void  CMD_CLR(void) {
   *_cmd_lport_clr |= _cmd_mask;
 }
 
-inline void  PS2X::ATT_SET(void) {
+inline void  ATT_SET(void) {
   *_att_lport_set |= _att_mask;
 }
 
-inline void PS2X::ATT_CLR(void) {
+inline void ATT_CLR(void) {
   *_att_lport_clr |= _att_mask;
 }
 
-inline bool PS2X::DAT_CHK(void) {
+inline bool DAT_CHK(void) {
   return (*_dat_lport & _dat_mask) ? true : false;
 }
 
