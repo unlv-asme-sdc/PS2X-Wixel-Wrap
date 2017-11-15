@@ -1,69 +1,5 @@
-/******************************************************************
-*  Super amazing PS2 controller Arduino Library v1.8
-*		details and example sketch: 
-*			http://www.billporter.info/?p=240
-*
-*    Original code by Shutter on Arduino Forums
-*
-*    Revamped, made into lib by and supporting continued development:
-*              Bill Porter
-*              www.billporter.info
-*
-*	 Contributers:
-*		Eric Wetzel (thewetzel@gmail.com)
-*		Kurt Eckhardt
-*
-*  Lib version history
-*    0.1 made into library, added analog stick support. 
-*    0.2 fixed config_gamepad miss-spelling
-*        added new functions:
-*          NewButtonState();
-*          NewButtonState(unsigned int);
-*          ButtonPressed(unsigned int);
-*          ButtonReleased(unsigned int);
-*        removed 'PS' from begining of ever function
-*    1.0 found and fixed bug that wasn't configuring controller
-*        added ability to define pins
-*        added time checking to reconfigure controller if not polled enough
-*        Analog sticks and pressures all through 'ps2x.Analog()' function
-*        added:
-*          enableRumble();
-*          enablePressures();
-*    1.1  
-*        added some debug stuff for end user. Reports if no controller found
-*        added auto-increasing sentence delay to see if it helps compatibility.
-*    1.2
-*        found bad math by Shutter for original clock. Was running at 50kHz, not the required 500kHz. 
-*        fixed some of the debug reporting. 
-*	1.3 
-*	    Changed clock back to 50kHz. CuriousInventor says it's suppose to be 500kHz, but doesn't seem to work for everybody. 
-*	1.4
-*		Removed redundant functions.
-*		Fixed mode check to include two other possible modes the controller could be in.
-*       Added debug code enabled by compiler directives. See below to enable debug mode.
-*		Added button definitions for shapes as well as colors.
-*	1.41
-*		Some simple bug fixes
-*		Added Keywords.txt file
-*	1.5
-*		Added proper Guitar Hero compatibility
-*		Fixed issue with DEBUG mode, had to send serial at once instead of in bits
-*	1.6
-*		Changed config_gamepad() call to include rumble and pressures options
-*			This was to fix controllers that will only go into config mode once
-*			Old methods should still work for backwards compatibility 
-*    1.7
-*		Integrated Kurt's fixes for the interrupts messing with servo signals
-*		Reorganized directory so examples show up in Arduino IDE menu
-*    1.8
-*		Added Arduino 1.0 compatibility. 
-*    1.9
-*       Kurt - Added detection and recovery from dropping from analog mode, plus
-*       integreated Chipkit (pic32mx...) support
-*
-*
-*
-*This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or(at your option) any later version.
+/*
+This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or(at your option) any later version.
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -77,30 +13,20 @@ GNU General Public License for more details.
 //#define PS2X_DEBUG
 //#define PS2X_COM_DEBUG
 
-#ifndef PS2X_lib_h
-  #define PS2X_lib_h
+#ifndef PS2X_w_lib_h
+  #define PS2X_w_lib_h
 
-#if ARDUINO > 22
-  #include "Arduino.h"
-#else
-  #include "WProgram.h"
-#endif
 
 #include <math.h>
 #include <stdio.h>
 #include <stdint.h>
-#ifdef __AVR__
-  // AVR
-  #include <avr/io.h>
-  #define CTRL_CLK        4
-  #define CTRL_BYTE_DELAY 3
-#else
-  // Pic32...
-  #include <pins_arduino.h>
-  #define CTRL_CLK        5
-  #define CTRL_CLK_HIGH   5
-  #define CTRL_BYTE_DELAY 4
-#endif 
+#include <wixel.h>
+#include <stdbool.h>
+
+//These are mcu specific delays, found through experimentation
+#define CTRL_CLK        4
+#define CTRL_BYTE_DELAY 3
+//#define CTRL_BYTE_DELAY 4
 
 //These are our button constants
 #define PSB_SELECT      0x0001
@@ -164,71 +90,46 @@ GNU General Public License for more details.
 #define CHK(x,y) (x & (1<<y))
 #define TOG(x,y) (x^=(1<<y))
 
-class PS2X {
-  public:
-    boolean Button(uint16_t);                //will be TRUE if button is being pressed
-    unsigned int ButtonDataByte();
-    boolean NewButtonState();
-    boolean NewButtonState(unsigned int);    //will be TRUE if button was JUST pressed OR released
-    boolean ButtonPressed(unsigned int);     //will be TRUE if button was JUST pressed
-    boolean ButtonReleased(unsigned int);    //will be TRUE if button was JUST released
-    void read_gamepad();
-    boolean  read_gamepad(boolean, byte);
-    byte readType();
-    byte config_gamepad(uint8_t, uint8_t, uint8_t, uint8_t);
-    byte config_gamepad(uint8_t, uint8_t, uint8_t, uint8_t, bool, bool);
-    void enableRumble();
-    bool enablePressures();
-    byte Analog(byte);
-    void reconfig_gamepad();
+#define boolean bool
+#define byte uint8_t
 
-  private:
-    inline void CLK_SET(void);
-    inline void CLK_CLR(void);
-    inline void CMD_SET(void);
-    inline void CMD_CLR(void);
-    inline void ATT_SET(void);
-    inline void ATT_CLR(void);
-    inline bool DAT_CHK(void);
-    
-    unsigned char _gamepad_shiftinout (char);
-    unsigned char PS2data[21];
-    void sendCommandString(byte*, byte);
-    unsigned char i;
-    unsigned int last_buttons;
-    unsigned int buttons;
-	
-    #ifdef __AVR__
-      uint8_t maskToBitNum(uint8_t);
-      uint8_t _clk_mask; 
-      volatile uint8_t *_clk_oreg;
-      uint8_t _cmd_mask; 
-      volatile uint8_t *_cmd_oreg;
-      uint8_t _att_mask; 
-      volatile uint8_t *_att_oreg;
-      uint8_t _dat_mask; 
-      volatile uint8_t *_dat_ireg;
-    #else
-      uint8_t maskToBitNum(uint8_t);
-      uint16_t _clk_mask; 
-      volatile uint32_t *_clk_lport_set;
-      volatile uint32_t *_clk_lport_clr;
-      uint16_t _cmd_mask; 
-      volatile uint32_t *_cmd_lport_set;
-      volatile uint32_t *_cmd_lport_clr;
-      uint16_t _att_mask; 
-      volatile uint32_t *_att_lport_set;
-      volatile uint32_t *_att_lport_clr;
-      uint16_t _dat_mask; 
-      volatile uint32_t *_dat_lport;
-    #endif
-	
-    unsigned long last_read;
-    byte read_delay;
-    byte controller_type;
-    boolean en_Rumble;
-    boolean en_Pressures;
-};
+boolean Button(uint16_t);                //will be TRUE if button is being pressed
+unsigned int ButtonDataByte();
+boolean NewButtonState();
+boolean NewButtonState(unsigned int);    //will be TRUE if button was JUST pressed OR released
+boolean ButtonPressed(unsigned int);     //will be TRUE if button was JUST pressed
+boolean ButtonReleased(unsigned int);    //will be TRUE if button was JUST released
+void read_gamepad();
+boolean  read_gamepad(boolean, byte);
+byte readType();
+byte config_gamepad(uint8_t, uint8_t, uint8_t, uint8_t);
+byte config_gamepad(uint8_t, uint8_t, uint8_t, uint8_t, bool, bool);
+void enableRumble();
+bool enablePressures();
+byte Analog(byte);
+void reconfig_gamepad();
+
+inline void CLK_SET(void);
+inline void CLK_CLR(void);
+inline void CMD_SET(void);
+inline void CMD_CLR(void);
+inline void ATT_SET(void);
+inline void ATT_CLR(void);
+inline bool DAT_CHK(void);
+
+unsigned char _gamepad_shiftinout (char);
+unsigned char PS2data[21];
+void sendCommandString(byte*, byte);
+unsigned char i;
+unsigned int last_buttons;
+unsigned int buttons;
+
+
+unsigned long last_read;
+byte read_delay;
+byte controller_type;
+boolean en_Rumble;
+boolean en_Pressures;
 
 #endif
 
