@@ -95,15 +95,15 @@ GNU General Public License for more details.
 
 boolean Button(uint16_t);                //will be TRUE if button is being pressed
 unsigned int ButtonDataByte();
-boolean NewButtonState();
+boolean NewButtonsState();
 boolean NewButtonState(unsigned int);    //will be TRUE if button was JUST pressed OR released
 boolean ButtonPressed(unsigned int);     //will be TRUE if button was JUST pressed
 boolean ButtonReleased(unsigned int);    //will be TRUE if button was JUST released
 void read_gamepad();
-boolean  read_gamepad(boolean, byte);
+boolean  read_gamepad_ext(boolean, byte);
 byte readType();
 byte config_gamepad(uint8_t, uint8_t, uint8_t, uint8_t);
-byte config_gamepad(uint8_t, uint8_t, uint8_t, uint8_t, bool, bool);
+byte config_gamepad_ext(uint8_t, uint8_t, uint8_t, uint8_t, bool, bool);
 void enableRumble();
 bool enablePressures();
 byte Analog(byte);
