@@ -48,7 +48,8 @@ byte Analog(byte button) {
 /****************************************************************************************/
 unsigned char _gamepad_shiftinout (char byte) {
    unsigned char tmp = 0;
-   for(unsigned char i=0;i<8;i++) {
+   unsigned char i;
+   for(i=0;i<8;i++) {
       if(CHK(byte,i)) CMD_SET();
       else CMD_CLR();
 	  
@@ -90,19 +91,22 @@ boolean read_gamepad_ext(boolean motor1, byte motor2) {
    byte dword2[12] = {0,0,0,0,0,0,0,0,0,0,0,0};
 
    // Try a few times to get valid data...
-   for (byte RetryCnt = 0; RetryCnt < 5; RetryCnt++) {
+   byte RetryCnt;
+   for (RetryCnt = 0; RetryCnt < 5; RetryCnt++) {
       CMD_SET();
       CLK_SET();
       ATT_CLR(); // low enable joystick
 
       delayMicroseconds(CTRL_BYTE_DELAY);
       //Send the command to send button and joystick data;
-      for (int i = 0; i<9; i++) {
+      int i;
+      for (i = 0; i<9; i++) {
          PS2data[i] = _gamepad_shiftinout(dword[i]);
       }
 
       if(PS2data[1] == 0x79) {  //if controller is in full data return mode, get the rest of data
-         for (int i = 0; i<12; i++) {
+	 int i;
+         for (i = 0; i<12; i++) {
             PS2data[i+9] = _gamepad_shiftinout(dword2[i]);
          }
       }
@@ -126,13 +130,15 @@ boolean read_gamepad_ext(boolean motor1, byte motor2) {
 
 #ifdef PS2X_COM_DEBUG
    Serial.println("OUT:IN");
-   for(int i=0; i<9; i++){
+   int i;
+   for(i=0; i<9; i++){
       Serial.print(dword[i], HEX);
       Serial.print(":");
       Serial.print(PS2data[i], HEX);
       Serial.print(" ");
    }
-   for (int i = 0; i<12; i++) {
+   int i;
+   for (i = 0; i<12; i++) {
       Serial.print(dword2[i], HEX);
       Serial.print(":");
       Serial.print(PS2data[i+9], HEX);
@@ -221,8 +227,8 @@ byte config_gamepad_ext(uint8_t clk, uint8_t cmd, uint8_t att, uint8_t dat, bool
 
   //try setting mode, increasing delays if need be.
   read_delay = 1;
-
-  for(int y = 0; y <= 10; y++) {
+  int y;
+  for(y = 0; y <= 10; y++) {
     sendCommandString(enter_config, sizeof(enter_config)); //start config run
 
     //read type
@@ -233,8 +239,8 @@ byte config_gamepad_ext(uint8_t clk, uint8_t cmd, uint8_t att, uint8_t dat, bool
     ATT_CLR(); // low enable joystick
 
     delayMicroseconds(CTRL_BYTE_DELAY);
-
-    for (int i = 0; i<9; i++) {
+    int i;
+    for (i = 0; i<9; i++) {
       temp[i] = _gamepad_shiftinout(type_read[i]);
     }
 
@@ -279,14 +285,16 @@ void sendCommandString(byte string[], byte len) {
   ATT_CLR(); // low enable joystick
   delayMicroseconds(CTRL_BYTE_DELAY);
 
-  for (int y=0; y < len; y++)
+  int y;
+  for (y=0; y < len; y++)
     temp[y] = _gamepad_shiftinout(string[y]);
 
   ATT_SET(); //high disable joystick
   delay(read_delay); //wait a few
 
   Serial.println("OUT:IN Configure");
-  for(int i=0; i<len; i++) {
+  int i;
+  for(i=0; i<len; i++) {
     Serial.print(string[i], HEX);
     Serial.print(":");
     Serial.print(temp[i], HEX);
@@ -295,7 +303,8 @@ void sendCommandString(byte string[], byte len) {
   Serial.println("");
 #else
   ATT_CLR(); // low enable joystick
-  for (int y=0; y < len; y++)
+  int y;
+  for (y=0; y < len; y++)
     _gamepad_shiftinout(string[y]);
   ATT_SET(); //high disable joystick
   delay(read_delay);                  //wait a few
