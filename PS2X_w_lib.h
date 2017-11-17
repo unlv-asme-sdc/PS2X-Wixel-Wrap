@@ -91,8 +91,8 @@ GNU General Public License for more details.
 #define TOG(x,y) (x^=(1<<y))
 
 #define boolean bool
-#define byte uint8_t
-#define double float
+#define byte uint8
+#define double uint32
 
 boolean Button(uint16_t);                //will be TRUE if button is being pressed
 unsigned int ButtonDataByte();
