@@ -92,6 +92,7 @@ GNU General Public License for more details.
 
 #define boolean bool
 #define byte uint8_t
+#define double float
 
 boolean Button(uint16_t);                //will be TRUE if button is being pressed
 unsigned int ButtonDataByte();
