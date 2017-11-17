@@ -80,6 +80,9 @@ void read_gamepad() {
 /****************************************************************************************/
 boolean read_gamepad_ext(boolean motor1, byte motor2) {
    double temp = millis() - last_read;
+   char dword[9] = {0x01,0x42,0,motor1,motor2,0,0,0,0};
+   byte dword2[12] = {0,0,0,0,0,0,0,0,0,0,0,0};
+   byte RetryCnt;
 
    if (temp > 1500) //waited to long
       reconfig_gamepad();
@@ -90,11 +93,8 @@ boolean read_gamepad_ext(boolean motor1, byte motor2) {
    if(motor2 != 0x00)
       motor2 = map(motor2,0,255,0x40,0xFF); //noting below 40 will make it spin
 
-   char dword[9] = {0x01,0x42,0,motor1,motor2,0,0,0,0};
-   byte dword2[12] = {0,0,0,0,0,0,0,0,0,0,0,0};
 
    // Try a few times to get valid data...
-   byte RetryCnt;
    for (RetryCnt = 0; RetryCnt < 5; RetryCnt++) {
       CMD_SET();
       CLK_SET();
@@ -170,6 +170,7 @@ byte config_gamepad(uint8_t clk, uint8_t cmd, uint8_t att, uint8_t dat) {
 byte config_gamepad_ext(uint8_t clk, uint8_t cmd, uint8_t att, uint8_t dat, bool pressures, bool rumble) {
 
   byte temp[sizeof(type_read)];
+  int y;
 
 #ifdef __AVR__
   _clk_mask = digitalPinToBitMask(clk);
@@ -230,7 +231,6 @@ byte config_gamepad_ext(uint8_t clk, uint8_t cmd, uint8_t att, uint8_t dat, bool
 
   //try setting mode, increasing delays if need be.
   read_delay = 1;
-  int y;
   for(y = 0; y <= 10; y++) {
     sendCommandString(enter_config, sizeof(enter_config)); //start config run
 
@@ -283,12 +283,12 @@ byte config_gamepad_ext(uint8_t clk, uint8_t cmd, uint8_t att, uint8_t dat, bool
 
 /****************************************************************************************/
 void sendCommandString(byte string[], byte len) {
+  int y;
 #ifdef PS2X_COM_DEBUG
   byte temp[len];
   ATT_CLR(); // low enable joystick
   delayMicroseconds(CTRL_BYTE_DELAY);
 
-  int y;
   for (y=0; y < len; y++)
     temp[y] = _gamepad_shiftinout(string[y]);
 
@@ -306,7 +306,6 @@ void sendCommandString(byte string[], byte len) {
   Serial.println("");
 #else
   ATT_CLR(); // low enable joystick
-  int y;
   for (y=0; y < len; y++)
     _gamepad_shiftinout(string[y]);
   ATT_SET(); //high disable joystick
