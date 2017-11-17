@@ -103,13 +103,13 @@ boolean read_gamepad_ext(boolean motor1, byte motor2) {
 
       delayMicroseconds(CTRL_BYTE_DELAY);
       //Send the command to send button and joystick data;
-      int i;
+      uint8 i;
       for (i = 0; i<9; i++) {
          PS2data[i] = _gamepad_shiftinout(dword[i]);
       }
 
       if(PS2data[1] == 0x79) {  //if controller is in full data return mode, get the rest of data
-	 int i;
+	 uint8 i;
          for (i = 0; i<12; i++) {
             PS2data[i+9] = _gamepad_shiftinout(dword2[i]);
          }
