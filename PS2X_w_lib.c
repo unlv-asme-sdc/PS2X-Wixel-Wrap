@@ -92,7 +92,7 @@ boolean read_gamepad_ext(boolean motor1, byte motor2) {
       delay(read_delay - temp);
 
    if(motor2 != 0x00)
-      motor2 = map(motor2,0,255,0x40,0xFF); //noting below 40 will make it spin
+      //motor2 = map(motor2,0,255,0x40,0xFF); //noting below 40 will make it spin
 
 
    // Try a few times to get valid data...
