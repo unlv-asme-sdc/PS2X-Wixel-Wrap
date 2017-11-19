@@ -103,34 +103,16 @@ boolean ButtonReleased(unsigned int);    //will be TRUE if button was JUST relea
 void read_gamepad();
 boolean  read_gamepad_ext(boolean, byte);
 byte readType();
-byte config_gamepad(uint8_t, uint8_t, uint8_t, uint8_t);
-byte config_gamepad_ext(uint8_t, uint8_t, uint8_t, uint8_t, bool, bool);
+byte config_gamepad();
 void enableRumble();
 bool enablePressures();
 byte Analog(byte);
 void reconfig_gamepad();
 
-inline void CLK_SET(void);
-inline void CLK_CLR(void);
-inline void CMD_SET(void);
-inline void CMD_CLR(void);
-inline void ATT_SET(void);
-inline void ATT_CLR(void);
-inline bool DAT_CHK(void);
 
 unsigned char _gamepad_shiftinout (char);
-unsigned char PS2data[21];
 void sendCommandString(byte*, byte);
-unsigned char i;
-unsigned int last_buttons;
-unsigned int buttons;
 
-
-unsigned long last_read;
-byte read_delay;
-byte controller_type;
-boolean en_Rumble;
-boolean en_Pressures;
 
 #endif
 

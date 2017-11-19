@@ -42,6 +42,16 @@ static byte exit_config[]={0x01,0x43,0x00,0x00,0x5A,0x5A,0x5A,0x5A,0x5A};
 static byte enable_rumble[]={0x01,0x4D,0x00,0x00,0x01};
 static byte type_read[]={0x01,0x45,0x00,0x5A,0x5A,0x5A,0x5A,0x5A,0x5A};
 
+static unsigned char i = 0;
+static unsigned int last_buttons = 0;
+static unsigned int buttons = 0;
+
+static unsigned long last_read = 0;
+static byte read_delay = 0;
+static byte controller_type = 0;
+static boolean en_Rumble = 0;
+static boolean en_Pressures = 0;
+unsigned char PS2data[21];
 /****************************************************************************************/
 boolean NewButtonsState() {
   return ((last_buttons ^ buttons) > 0);
