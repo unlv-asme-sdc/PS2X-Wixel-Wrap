@@ -227,9 +227,9 @@ byte config_gamepad() {
   //If still anything but 41, 73 or 79, then it's not talking
   if(PS2data[1] != 0x41 && PS2data[1] != 0x73 && PS2data[1] != 0x79){ 
 #ifdef PS2X_DEBUG
-    Serial.println("Controller mode not matched or no controller found");
-    Serial.print("Expected 0x41, 0x73 or 0x79, but got ");
-    Serial.println(PS2data[1], HEX);
+    //Serial.println("Controller mode not matched or no controller found");
+    //Serial.print("Expected 0x41, 0x73 or 0x79, but got ");
+    //Serial.println(PS2data[1], HEX);
 #endif
     return 1; //return error code 1
   }
@@ -256,20 +256,19 @@ byte config_gamepad() {
 
     controller_type = temp[3];
 
-    sendCommandString(set_mode, sizeof(set_mode));
-    if(rumble){ sendCommandString(enable_rumble, sizeof(enable_rumble)); en_Rumble = true; }
-    if(pressures){ sendCommandString(set_bytes_large, sizeof(set_bytes_large)); en_Pressures = true; }
-    sendCommandString(exit_config, sizeof(exit_config));
+    //sendCommandString(set_mode, sizeof(set_mode));
+    //if(rumble){ sendCommandString(enable_rumble, sizeof(enable_rumble)); en_Rumble = true; }
+    //if(pressures){ sendCommandString(set_bytes_large, sizeof(set_bytes_large)); en_Pressures = true; }
+    //sendCommandString(exit_config, sizeof(exit_config));
 
     read_gamepad();
 
-    if(pressures){
-      if(PS2data[1] == 0x79)
-        break;
-      if(PS2data[1] == 0x73)
-        return 3;
-    }
-
+    //if(pressures){
+    //  if(PS2data[1] == 0x79)
+    //    break;
+    //  if(PS2data[1] == 0x73)
+    //    return 3;
+    //}
     if(PS2data[1] == 0x73)
       break;
 
