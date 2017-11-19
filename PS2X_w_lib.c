@@ -1,11 +1,39 @@
-#include "PS2X_w_lib.h"
 #include <math.h>
 #include <stdio.h>
 #include <stdint.h>
+#include "PS2X_w_lib.h"
 
 #define millis() getMs()
 #define delay(time) delayMs(time)
 #define bitSet(value, bit) ((value) |= (1UL << (bit)))
+
+// INPUT_PORT must never be equal to OUTPORT_PORT.
+// They are mutually exclusive values.
+// Never use pins 0 or 1 on PORT 1
+#define IN_PORT 0
+#define DAT_PIN 1
+
+// Never use pins 0 or 1 on PORT 1
+#define OUT_PORT 1
+#define ATT_PIN 2
+#define CLK_PIN 3
+#define CMD_PIN 4 
+
+// TODO: Figure out how to use defined preprocessors macros as macro arguments.
+#define SET_DIGITAL_OUTPUT(port, pin, value) { \
+	P##port##_##pin = value; \
+	P##port##DIR |= (1<<pin); }
+#define SET_DIGITAL_INPUT(port, pin, pulled) { \
+	if (pulled){ P##port##INP &= ~(1<<pin); } else { P##port##INP |= (1<<pin); } \
+	P##port##DIR &= ~(1<<pin); }
+
+#define CLK_SET() SET_DIGITAL_OUTPUT(1, 2, 1)
+#define CLK_CLR() SET_DIGITAL_OUTPUT(1, 2, 0)
+#define CMD_SET() SET_DIGITAL_OUTPUT(1, 3, 1)
+#define CMD_CLR() SET_DIGITAL_OUTPUT(1, 3, 0)
+#define ATT_SET() SET_DIGITAL_OUTPUT(1, 4, 1)
+#define ATT_CLR() SET_DIGITAL_OUTPUT(1, 4, 0)
+#define DAT_CHK() P0_1
 
 static byte enter_config[]={0x01,0x43,0x00,0x01,0x00};
 static byte set_mode[]={0x01,0x44,0x00,0x01,0x03,0x00,0x00,0x00,0x00};
