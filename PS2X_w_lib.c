@@ -247,7 +247,6 @@ byte config_gamepad() {
     ATT_CLR(); // low enable joystick
 
     delayMicroseconds(CTRL_BYTE_DELAY);
-    int i;
     for (i = 0; i<9; i++) {
       temp[i] = _gamepad_shiftinout(type_read[i]);
     }
