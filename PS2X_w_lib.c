@@ -127,6 +127,8 @@ boolean read_gamepad_ext(boolean motor1, byte motor2) {
    char dword[9] = {0x01,0x42,0,motor1,motor2,0,0,0,0};
    byte dword2[12] = {0,0,0,0,0,0,0,0,0,0,0,0};
    byte RetryCnt;
+   uint8 i;
+   uint8 j;
 
    if (temp > 1500) //waited to long
       reconfig_gamepad();
@@ -146,15 +148,13 @@ boolean read_gamepad_ext(boolean motor1, byte motor2) {
 
       delayMicroseconds(CTRL_BYTE_DELAY);
       //Send the command to send button and joystick data;
-      uint8 i;
       for (i = 0; i<9; i++) {
          PS2data[i] = _gamepad_shiftinout(dword[i]);
       }
 
-      if(PS2data[1] == 0x79) {  //if controller is in full data return mode, get the rest of data
-	 uint8 i;
-         for (i = 0; i<12; i++) {
-            PS2data[i+9] = _gamepad_shiftinout(dword2[i]);
+      if(PS2data[1] == 0x79) {  //jf controller js jn full data return mode, get the rest of data
+         for (j = 0; j<12; j++) {
+            PS2data[j+9] = _gamepad_shiftinout(dword2[j]);
          }
       }
 
