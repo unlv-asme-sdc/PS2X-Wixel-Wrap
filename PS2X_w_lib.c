@@ -206,56 +206,17 @@ boolean read_gamepad_ext(boolean motor1, byte motor2) {
 }
 
 /****************************************************************************************/
-byte config_gamepad(uint8_t clk, uint8_t cmd, uint8_t att, uint8_t dat) {
-   return config_gamepad(clk, cmd, att, dat, false, false);
-}
-
-/****************************************************************************************/
-byte config_gamepad_ext(uint8_t clk, uint8_t cmd, uint8_t att, uint8_t dat, bool pressures, bool rumble) {
+byte config_gamepad() {
 
   byte temp[sizeof(type_read)];
   int y;
+  uint8 i;
+  
+  // Sets pinmodes for Data.
+  P2INP &= ~(1<<5);
+  SET_DIGITAL_INPUT(0, 1, 1);
 
-#ifdef __AVR__
-  _clk_mask = digitalPinToBitMask(clk);
-  _clk_oreg = portOutputRegister(digitalPinToPort(clk));
-  _cmd_mask = digitalPinToBitMask(cmd);
-  _cmd_oreg = portOutputRegister(digitalPinToPort(cmd));
-  _att_mask = digitalPinToBitMask(att);
-  _att_oreg = portOutputRegister(digitalPinToPort(att));
-  _dat_mask = digitalPinToBitMask(dat);
-  _dat_ireg = portInputRegister(digitalPinToPort(dat));
-#else
-  uint32_t            lport;                   // Port number for this pin
-  _clk_mask = digitalPinToBitMask(clk);
-  lport = digitalPinToPort(clk);
-  _clk_lport_set = portOutputRegister(lport) + 2;
-  _clk_lport_clr = portOutputRegister(lport) + 1;
-
-  _cmd_mask = digitalPinToBitMask(cmd);
-  lport = digitalPinToPort(cmd);
-  _cmd_lport_set = portOutputRegister(lport) + 2;
-  _cmd_lport_clr = portOutputRegister(lport) + 1;
-
-  _att_mask = digitalPinToBitMask(att);
-  lport = digitalPinToPort(att);
-  _att_lport_set = portOutputRegister(lport) + 2;
-  _att_lport_clr = portOutputRegister(lport) + 1;
-
-  _dat_mask = digitalPinToBitMask(dat);
-  _dat_lport = portInputRegister(digitalPinToPort(dat));
-#endif
-
-  pinMode(clk, OUTPUT); //configure ports
-  pinMode(att, OUTPUT);
-  pinMode(cmd, OUTPUT);
-  pinMode(dat, INPUT);
-
-#if defined(__AVR__)
-  digitalWrite(dat, HIGH); //enable pull-up
-#endif
-
-  CMD_SET(); // SET(*_cmd_oreg,_cmd_mask);
+  CMD_SET(); 
   CLK_SET();
 
   //new error checking. First, read gamepad a few times to see if it's talking
