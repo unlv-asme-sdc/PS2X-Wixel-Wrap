@@ -92,14 +92,19 @@ unsigned char _gamepad_shiftinout (char byte) {
    unsigned char tmp = 0;
    unsigned char i;
    for(i=0;i<8;i++) {
-      if(CHK(byte,i)) CMD_SET();
-      else CMD_CLR();
+      if(CHK(byte,i)) { 
+	      CMD_SET();
+      } else {
+	      CMD_CLR();
+      }
 	  
       CLK_CLR();
       delayMicroseconds(CTRL_CLK);
 
       //if(DAT_CHK()) SET(tmp,i);
-      if(DAT_CHK()) bitSet(tmp,i);
+      if(DAT_CHK()) {
+	      bitSet(tmp,i);
+      }
 
       CLK_SET();
 #if CTRL_CLK_HIGH
